@@ -163,6 +163,8 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+
 		var k KringleRequest
 
 		err := json.NewDecoder(r.Body).Decode(&k)
@@ -174,6 +176,11 @@ func main() {
 		}
 
 		log.WithField("emails", k.Emails).Info("Received emails")
+
+    if len(k.Emails) > 10 {
+      w.WriteHeader(http.StatusBadRequest)
+      w.Write([]byte("Up to 10 emails at once only."))
+    }
 
 		// Create a channel to communicate between the goroutines.
 		// statusChannel := make(chan string)
